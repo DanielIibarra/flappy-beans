@@ -28,7 +28,7 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
-    
+
     const fondo = this.add.sprite(0, 0, 'fondo');
     fondo.setDisplaySize(800, 1400);
 
@@ -64,7 +64,7 @@ export default class Game extends Phaser.Scene {
       callbackScope: this,
       loop: true
     });
-   
+
   }
   scoreact() {
     this.scoreValue += 1; // Incrementa el puntaje actual
@@ -74,15 +74,15 @@ export default class Game extends Phaser.Scene {
       this.scoreValue2 += 1;
     }
     this.score1.text = this.score1.setTexture(String(this.scoreValue)); // Actualiza el texto del puntaje
-    
+
   }
 
-  dosDigitos(scoreValue2){
-    if(scoreValue2 === 1){
-    this.score2 = this.add.image(175, 200, '1')
-    this.score2.setDepth(1);
-  }
-    else{
+  dosDigitos(scoreValue2) {
+    if (scoreValue2 === 1) {
+      this.score2 = this.add.image(175, 200, '1')
+      this.score2.setDepth(1);
+    }
+    else {
       this.score2.text = this.score2.setTexture(String(this.scoreValue2));
     }
   }
@@ -116,9 +116,14 @@ export default class Game extends Phaser.Scene {
     this.player.body.gravity.y = 1000;
     this.gameover = this.add.image(185, 200, 'Game-over');
     this.gameover.setDepth(2);
-    this.input.on('pointerdown', () => this.scene.start('game'));
+    this.input.on('pointerdown', () => {
+      this.scoreValue = 0;
+      this.scoreValue2 = 1;
+      this.scene.start('game')});
     this.input.keyboard.on('keydown', (event) => {
       if (event.keyCode === 32) {
+        this.scoreValue = 0;
+        this.scoreValue2 = 1;
         this.scene.start('game')
       }
     });
