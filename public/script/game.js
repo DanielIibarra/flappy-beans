@@ -28,7 +28,7 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
-
+    
     const fondo = this.add.sprite(0, 0, 'fondo');
     fondo.setDisplaySize(800, 1400);
 
@@ -116,7 +116,12 @@ export default class Game extends Phaser.Scene {
     this.player.body.gravity.y = 1000;
     this.gameover = this.add.image(185, 200, 'Game-over');
     this.gameover.setDepth(2);
-
+    this.input.on('pointerdown', () => this.scene.start('game'));
+    this.input.keyboard.on('keydown', (event) => {
+      if (event.keyCode === 32) {
+        this.scene.start('game')
+      }
+    });
   }
 
   saltar() {
