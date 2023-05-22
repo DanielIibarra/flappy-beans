@@ -118,7 +118,7 @@ export default class Game extends Phaser.Scene {
   }
 
   scoreGlobalbd() {
-    fetch('http://localhost:3000/scorebd')
+    fetch('https://flappybeans.azurewebsites.net/scorebd')
       .then(response => response.json())
       .then(data => {
         this.scoreImport = data.scores.scorebd
@@ -129,7 +129,7 @@ export default class Game extends Phaser.Scene {
   updateScore() {
     let scorebd = this.scoreGlobal;
     const data = { scorebd };
-    fetch('http://localhost:3000/scoreupdate', {
+    fetch('https://flappybeans.azurewebsites.net/scoreupdate', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
