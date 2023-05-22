@@ -3,7 +3,7 @@ import Game from './game.js'
 const config = {
   type: Phaser.AUTO,
   width: 390,
-  height: 650,
+  height: 657,
   parent: 'game',
   scene: [Game],
   physics: {
@@ -11,7 +11,7 @@ const config = {
     arcade: {
       debug: false,
       gravity: {
-        y: 400,
+        y: 500,
       }
     }
   }

@@ -1,8 +1,10 @@
 export default class Game extends Phaser.Scene {
   constructor() {
     super({ key: 'game' });
+    this.scoreGlobal = 0;
     this.scoreValue = 0;
     this.scoreValue2 = 1;
+    this.scoreImport = 0;
   }
 
   preload() {
@@ -24,10 +26,16 @@ export default class Game extends Phaser.Scene {
     this.load.image('7', './png/fbs-42.png');
     this.load.image('8', './png/fbs-43.png');
     this.load.image('9', './png/fbs-44.png');
+    this.load.image('new', './png/fbs-21.png');
+    this.load.image('silver', './png/fbs-23.png');
+    this.load.image('gold', './png/fbs-24.png');
     this.load.image('Game-over', './png/fbs-32.png');
+    this.load.image('scoreboard', './png/fbs-12.png');
   }
 
   create() {
+
+    this.scoreGlobalbd()
 
     const fondo = this.add.sprite(0, 0, 'fondo');
     fondo.setDisplaySize(800, 1400);
@@ -67,6 +75,7 @@ export default class Game extends Phaser.Scene {
 
   }
   scoreact() {
+    this.scoreGlobal += 1;
     this.scoreValue += 1; // Incrementa el puntaje actual
     if (this.scoreValue > 9) {
       this.scoreValue = 0;
@@ -87,15 +96,13 @@ export default class Game extends Phaser.Scene {
     }
   }
 
-
-
   nuevaColumna() {
     const columna = this.physics.add.group();
 
     const hueco = Math.floor(Math.random() * 4) + 4;
     for (let i = 0; i < 14; i++) {
       if (i == hueco - 2) {
-        const cubo = columna.create(400, i * 45 - 120, 'tuberiaarriba');
+        const cubo = columna.create(400, i * 45 - 110, 'tuberiaarriba');
         cubo.body.allowGravity = false;
       } else if (i == hueco + 2) {
         const cubo = columna.create(400, i * 45 + 160, 'tuberiaabajo');
@@ -110,20 +117,70 @@ export default class Game extends Phaser.Scene {
     this.physics.add.overlap(this.player, columna, this.hitColumna, null, this);
   }
 
+  scoreGlobalbd() {
+    fetch('http://localhost:3000/scorebd')
+      .then(response => response.json())
+      .then(data => {
+        this.scoreImport = data.scores.scorebd
+      })
+      .catch(err => console.log(err))
+  }
+
+  updateScore() {
+    let scorebd = this.scoreGlobal;
+    const data = { scorebd };
+    fetch('http://localhost:3000/scoreupdate', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .catch(error => console.log(error));
+  }
+
   hitColumna() {
+    if (this.scoreGlobal > this.scoreImport) {
+      this.updateScore()
+    }
     this.physics.pause('Game'); // Detener la simulación de física (pausar el juego)
     this.time.removeAllEvents(); // Detener todos los timers y eventos
     this.player.body.gravity.y = 1000;
-    this.gameover = this.add.image(185, 200, 'Game-over');
+    this.gameover = this.add.image(197, 200, 'Game-over');
+    this.scoreboard = this.physics.add.sprite(195, 320, 'scoreboard');
+    this.textscoreboard = this.add.text(260, 285, this.scoreGlobal, {
+      fontSize: '20px',
+      fill: '#fff',
+      fontFamily: 'verdana, arial, sans-serif'
+    })
+    if (this.scoreImport < this.scoreGlobal) {
+      this.scoreboard = this.physics.add.sprite(110, 249, 'new');
+      this.scoreImport = this.scoreGlobal
+      if (this.scoreGlobal >= 20 && this.scoreGlobal <= 50) {
+        this.scoreboard = this.physics.add.sprite(143, 320, 'silver');
+      }
+      if (this.scoreGlobal >= 51 && this.scoreGlobal <= 99) {
+        this.scoreboard = this.physics.add.sprite(143, 320, 'gold');
+      }
+    }
+    this.textscoreboardMAx = this.add.text(260, 330, this.scoreImport, {
+      fontSize: '20px',
+      fill: '#fff',
+      fontFamily: 'verdana, arial, sans-serif'
+    })
     this.gameover.setDepth(2);
     this.input.on('pointerdown', () => {
       this.scoreValue = 0;
       this.scoreValue2 = 1;
-      this.scene.start('game')});
+      this.scoreGlobal = 0;
+      this.scene.start('game')
+    });
     this.input.keyboard.on('keydown', (event) => {
       if (event.keyCode === 32) {
         this.scoreValue = 0;
         this.scoreValue2 = 1;
+        this.scoreGlobal = 0;
         this.scene.start('game')
       }
     });
